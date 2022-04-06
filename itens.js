@@ -8,7 +8,7 @@ const itens = [
     },
     rabadon = {
         nome: "rabadon",
-        src: "./imagens/rabadon.webp",
+        src: "./imagens/rabadon.jpeg",
         dano: 0,
         id: "df",
         ap: 100,
