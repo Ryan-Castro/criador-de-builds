@@ -1,14 +1,14 @@
 const itens = [
     dançaDaMorte = {
         nome: "dança da morte",
-        src: "imagens/dansadamorte.webp",
+        src: "./imagens/dansadamorte.webp",
         dano: 100,
         id: "df",
         ap: 0,
     },
     rabadon = {
         nome: "rabadon",
-        src: "imagens/rabadon.webp",
+        src: "./imagens/rabadon.webp",
         dano: 0,
         id: "df",
         ap: 100,
