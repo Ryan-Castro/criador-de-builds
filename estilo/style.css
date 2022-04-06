@@ -1,0 +1,27 @@
+*{
+    margin: 0px;
+    padding: 0px;
+    /*background-color: #092130*/
+}
+
+header{
+    color: #CEB98A;
+    padding: 10px;
+}
+header a {
+    color: #CEB98A;
+    text-decoration: none;
+}
+nav a{
+    border: 1px solid rgba(0, 0, 0, 0.438);
+    text-decoration: none;
+    color: #CEB98A;
+}
+main{
+    display: flex;
+}
+iframe{
+    width: 1000px;
+    height: 699px;
+    border: 1px solid rgb(255, 255, 255);
+}
