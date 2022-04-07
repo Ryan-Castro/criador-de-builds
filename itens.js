@@ -5,6 +5,8 @@ const itens = [
         dano: 100,
         id: "df",
         ap: 0,
+        ouro: 3200,
+        detalhes: "tanka pra vc e depois vai levar true damege"
     },
     rabadon = {
         nome: "rabadon",
@@ -12,6 +14,8 @@ const itens = [
         dano: 0,
         id: "df",
         ap: 100,
+        ouro: 3200,
+        detalhes: "dá mais ap"
     },
 
 ]

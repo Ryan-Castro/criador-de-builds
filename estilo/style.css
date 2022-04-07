@@ -25,3 +25,13 @@ iframe{
     height: 699px;
     border: 1px solid rgb(255, 255, 255);
 }
+section{
+    background-color: lightgray;
+    width: calc(100% - 1000px);
+}
+
+td{
+    border: 1px solid black;
+    width: 100px;
+    height: 100px;
+}
