@@ -1,37 +1,52 @@
 *{
     margin: 0px;
     padding: 0px;
-    /*background-color: #092130*/
+    background-color: black;
 }
 
 header{
-    color: #CEB98A;
+    color: #b17a02;
     padding: 10px;
+    height: 20px;
 }
 header a {
     color: #CEB98A;
     text-decoration: none;
 }
+nav{
+    height: 20px;
+}
 nav a{
     border: 1px solid rgba(0, 0, 0, 0.438);
     text-decoration: none;
     color: #CEB98A;
+    border: 1px solid #b17a02;
 }
 main{
     display: flex;
 }
-iframe{
-    width: 1000px;
-    height: 699px;
-    border: 1px solid rgb(255, 255, 255);
+#myIframe{
+    width: 80%;
+    height: calc(100vh - 62px);
+    border: 1px solid #b17a02;
 }
 section{
-    background-color: lightgray;
+    padding-left: 20px;
+    box-sizing: border-box;
     width: calc(100% - 1000px);
+    position: relative;
+    color: white;
 }
-
+table{
+    position: absolute;
+    bottom: 0px;
+    margin: auto;
+    left: 0px;
+    right: 0px;
+}
 td{
-    border: 1px solid black;
+    border: 1px solid rgb(255, 255, 255);
     width: 100px;
     height: 100px;
+    background-size: cover;
 }
