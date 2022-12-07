@@ -1,16 +1,20 @@
 import Header from "./componets/Header";
 import styled from "styled-components"
+import Home from "./componets/Home";
 
 const Content = styled.div`
-  margin: 0px;
-  padding: 0px;
+`
+
+const Main = styled.div`
+  width: 100vw;
+  height: calc(100vh - 100px);
 `
 
 function App() {
   return (
     <Content>
-      <Header/>
-      <h1>hello world!!</h1>
+      <Header></Header>
+      <Main><Home></Home></Main>
     </Content>
   );
 }
