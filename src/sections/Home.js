@@ -32,6 +32,10 @@ const Button = styled.button`
     text-shadow: 1px 1px 1px black;
 ` 
 
+const Link = styled.a`
+    width: 100%;
+` 
+
 export default function Home(props){
 
     return(
@@ -40,10 +44,10 @@ export default function Home(props){
             <Text>Aqui reunirá algumas informaçoes de League Of Legends</Text>
             <Text>O que você desejá fazer?</Text>
             <ConteinerInputs>
-                <Button bgColor="red">Criar Uma build do LOL</Button>
-                <Button bgColor="black">Criar uma build do TFT</Button>
-                <Button bgColor="blue">Ver suas informações do jogo</Button>
-                <Button bgColor="green">Ver as mudanças</Button>
+                <Link href="/buildlol"><Button bgColor="red" onClick={props.handleMain} value={0}>Criar Uma build do LOL</Button></Link>
+                <Link href="/buildtft"><Button bgColor="black" onClick={props.handleMain} value={1}>Criar uma build do TFT</Button></Link>
+                <Link href="/info"><Button bgColor="blue" onClick={props.handleMain} value={2}>Ver suas informações do jogo</Button></Link>
+                <Link href="/version"><Button bgColor="green" onClick={props.handleMain} value={3}>Ver as mudanças</Button></Link>
             </ConteinerInputs>
         </Content>
     )
