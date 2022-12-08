@@ -1,15 +1,14 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import styled, { createGlobalStyle } from "styled-components"
 import Card from "../componets/Card"
 import NavSelectLOL from "../componets/NavSelectLOL"
 
 const Content = styled.div`
-width: 100%;
+width: 100vw;
 background-image: url('https://cdn.wallpapersafari.com/54/81/YWO8us.jpg');
 display: flex;
 justify-content: space-evenly;
 align-items: center;
-flex-direction: column;
 `
 
 const DivInput = styled.div`
@@ -38,12 +37,42 @@ const GlobalStyle = createGlobalStyle`
     }
 `
 
+const Build = styled.div`
+    width: 30vw;
+    height: calc(100vh - 100px);
+    background-color: yellow;
+    float: right;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+
+    #champIcon{
+        width: 120px;
+        margin-top: 30px;
+    }
+
+    #itemsOfBuild{
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        justify-items: center;
+        gap: 20px;
+    }
+
+    img{
+        width: 80px;
+    }
+
+`
+
 
 export default function BuildLOL(){
 
     const [map, setMap] = useState(11)
     const [isItems, setIsItems] = useState(false)
     const [itemsArrey, setItemsArrey] = useState([])
+    const [build, setBuild] = useState([])
+    const champion = useRef()
 
 
     useEffect(()=>{
@@ -90,6 +119,23 @@ export default function BuildLOL(){
             })
     }
 
+    function updateBuild(type, item, index){
+        if(type === "champion"){
+            champion.current.src = `http://ddragon.leagueoflegends.com/cdn/12.22.1/img/champion/${item}.png`
+            champion.current.alt = `${item}`
+        }
+        if(type === "item"){
+            if(build.length<6){
+                setBuild([...build, [[itemsArrey[index][0]], "item", item]])
+            }
+        }
+    }
+
+    function removeItem(type, item, index){
+        //console.log("foi")
+        //setBuild((current)=>{console.log(current)})
+    }
+
 
     return(
         <Content>
@@ -97,14 +143,16 @@ export default function BuildLOL(){
                 <NavSelectLOL handleChampions={searchChampion} handleItems={searchItems} handleMap={updateMap}></NavSelectLOL>
                 <Main>
                     <GlobalStyle/>
-                    {itemsArrey.map((item,i)=><Card type={item[1]} id={item[0].id?item[0].id:item[2]} key={i}></Card>)}
+                    {itemsArrey.map((item,i)=><Card type={item[1]} id={item[0].id?item[0].id:item[2]} key={i} num={i} handleClick={updateBuild}></Card>)}
                 </Main>
             </DivInput>
-        <section>
-            <img src="" alt="" id="champIcon"/>
-            <div></div>
-            <div id="itemsOfBuild"></div>
-        </section>
+            <Build>
+                <img src="" alt="" id="champIcon" ref={champion}/>
+                <div></div>
+                <div id="itemsOfBuild">
+                    {build.map((item,i)=><Card type={item[1]} id={item[0].id?item[0].id:item[2]} key={i} num={i} handleClick={removeItem}></Card>)}
+                    </div>
+            </Build>
         </Content>
     )
 }
