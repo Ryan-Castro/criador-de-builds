@@ -44,10 +44,10 @@ export default function Home(props){
             <Text>Aqui reunirá algumas informaçoes de League Of Legends</Text>
             <Text>O que você desejá fazer?</Text>
             <ConteinerInputs>
-                <Link href="/buildlol"><Button bgColor="red" onClick={props.handleMain} value={0}>Criar Uma build do LOL</Button></Link>
-                <Link href="/buildtft"><Button bgColor="black" onClick={props.handleMain} value={1}>Criar uma build do TFT</Button></Link>
-                <Link href="/info"><Button bgColor="blue" onClick={props.handleMain} value={2}>Ver suas informações do jogo</Button></Link>
-                <Link href="/version"><Button bgColor="green" onClick={props.handleMain} value={3}>Ver as mudanças</Button></Link>
+                <Link href="/buildlol"><Button bgColor="red" value={0}>Criar Uma build do LOL</Button></Link>
+                <Link href="/buildtft"><Button bgColor="black" value={1}>Criar uma build do TFT</Button></Link>
+                <Link href="/info"><Button bgColor="blue" value={2}>Ver suas informações do jogo</Button></Link>
+                <Link href="/version"><Button bgColor="green" value={3}>Ver as mudanças</Button></Link>
             </ConteinerInputs>
         </Content>
     )

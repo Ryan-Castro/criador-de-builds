@@ -33,10 +33,10 @@ export default function Header(props){
         <Content>
             <Link href="/"><Logo>Criador de builds</Logo></Link>
             <List>
-                <Link href="/buildlol"><Li onClick={props.handleMain} value="0">LoL</Li></Link>
-                <Link href="/buildtft"><Li onClick={props.handleMain} value="1">TFT</Li></Link>
-                <Link href="/info"><Li onClick={props.handleMain} value="2">Informações</Li></Link>
-                <Link href="/version"><Li onClick={props.handleMain} value="3">Versões</Li></Link>
+                <Link href="/buildlol"><Li value="0">LoL</Li></Link>
+                <Link href="/buildtft"><Li value="1">TFT</Li></Link>
+                <Link href="/info"><Li value="2">Informações</Li></Link>
+                <Link href="/version"><Li value="3">Versões</Li></Link>
             </List>
         </Content>
     )

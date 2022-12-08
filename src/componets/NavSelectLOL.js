@@ -1,0 +1,21 @@
+import styled from "styled-components"
+
+const Nav = styled.div`
+    width: 70vw;
+    height: 50px;
+    background-color: red;
+`
+
+export default function NavSelectLOL(props){
+
+    return(
+        <Nav>
+            <input type="button" value="Campeões" onClick={props.handleChampions}/>
+            <input type="button" value="Itens" onClick={props.handleItems}/>
+            <select onChange={props.handleMap}>
+                <option value="11">Summoner's Rift</option>
+                <option value="12">ARAM</option>
+            </select>
+        </Nav>
+    )
+}
