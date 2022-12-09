@@ -1,6 +1,4 @@
 import { useEffect, useRef, useState } from "react"
-import { matchRoutes } from "react-router-dom"
-import { applyMiddleware } from "redux"
 import styled, { createGlobalStyle } from "styled-components"
 import Card from "../componets/Card"
 import NavSelectLOL from "../componets/NavSelectLOL"
@@ -76,7 +74,6 @@ export default function BuildLOL(){
     const [build, setBuild] = useState([])
     const champion = useRef()
     const [championSelect, setChampionSelect] = useState(null)
-    const [statsBuild, setStatsBuild] = useState({})
     const stats = useRef()
 
 
@@ -126,7 +123,7 @@ export default function BuildLOL(){
 
     useEffect(()=>{
         updateStatus()
-    },[championSelect, build])
+    })
 
     function updateBuild(type, item, index){
         if(type === "champion"){
@@ -169,6 +166,12 @@ export default function BuildLOL(){
             statsCurrent.spellblock = championSelect.spellblock + (championSelect.spellblockperlevel*18)
             statsCurrent.attackspeed = championSelect.attackspeed + (championSelect.attackspeedperlevel*18)
             statsCurrent.movespeed = championSelect.movespeed
+        }
+
+        if(build.length > 0){
+            build.forEach((item)=>{
+                console.log(item[0][0].description)
+            })
         }
 
         stats.current.innerHTML = `
