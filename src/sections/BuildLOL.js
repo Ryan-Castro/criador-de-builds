@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react"
+import { matchRoutes } from "react-router-dom"
+import { applyMiddleware } from "redux"
 import styled, { createGlobalStyle } from "styled-components"
 import Card from "../componets/Card"
 import NavSelectLOL from "../componets/NavSelectLOL"
@@ -73,6 +75,9 @@ export default function BuildLOL(){
     const [itemsArrey, setItemsArrey] = useState([])
     const [build, setBuild] = useState([])
     const champion = useRef()
+    const [championSelect, setChampionSelect] = useState(null)
+    const [statsBuild, setStatsBuild] = useState({})
+    const stats = useRef()
 
 
     useEffect(()=>{
@@ -119,10 +124,16 @@ export default function BuildLOL(){
             })
     }
 
+    useEffect(()=>{
+        updateStatus()
+    },[championSelect, build])
+
     function updateBuild(type, item, index){
         if(type === "champion"){
             champion.current.src = `http://ddragon.leagueoflegends.com/cdn/12.22.1/img/champion/${item}.png`
             champion.current.alt = `${item}`
+            setChampionSelect(itemsArrey[index][0].stats)
+            
         }
         if(type === "item"){
             if(build.length<6){
@@ -132,8 +143,47 @@ export default function BuildLOL(){
     }
 
     function removeItem(type, item, index){
-        //console.log("foi")
-        //setBuild((current)=>{console.log(current)})
+        let array = build
+        array.splice(index, 1)
+        setBuild([...array])
+    }
+
+    function updateStatus(){
+        let statsCurrent = {
+            hp: 0,
+            mp: 0,
+            ad: 0,
+            ap: 0,
+            armor: 0,
+            spellblock: 0,
+            attackspeed: 0,
+            cdr: 0,
+            crit: 0,
+            movespeed: 0,
+        }
+        if(championSelect){
+            statsCurrent.hp = championSelect.hp + (championSelect.hpperlevel*18)
+            statsCurrent.mp = championSelect.mp + (championSelect.mpperlevel*18)
+            statsCurrent.ad = championSelect.attackdamage + (championSelect.attackdamageperlevel*18)
+            statsCurrent.armor = championSelect.armor + (championSelect.armorperlevel*18)
+            statsCurrent.spellblock = championSelect.spellblock + (championSelect.spellblockperlevel*18)
+            statsCurrent.attackspeed = championSelect.attackspeed + (championSelect.attackspeedperlevel*18)
+            statsCurrent.movespeed = championSelect.movespeed
+        }
+
+        stats.current.innerHTML = `
+                                    <li>HP: ${statsCurrent.hp}<li>
+                                    <li>Mana: ${statsCurrent.mp}<li>
+                                    <li>AD: ${statsCurrent.ad}<li>
+                                    <li>AP: ${statsCurrent.ap}<li>
+                                    <li>Armor: ${statsCurrent.armor}<li>
+                                    <li>MR: ${statsCurrent.spellblock}<li>
+                                    <li>AttackSpeed: ${statsCurrent.attackspeed}<li>
+                                    <li>CDR: ${statsCurrent.cdr}<li>
+                                    <li>Critc: ${statsCurrent.crit}<li>
+                                    <li>Movespeed: ${statsCurrent.movespeed}<li>
+                                    `
+   
     }
 
 
@@ -148,7 +198,7 @@ export default function BuildLOL(){
             </DivInput>
             <Build>
                 <img src="" alt="" id="champIcon" ref={champion}/>
-                <div></div>
+                <div><ul  ref={stats}></ul></div>
                 <div id="itemsOfBuild">
                     {build.map((item,i)=><Card type={item[1]} id={item[0].id?item[0].id:item[2]} key={i} num={i} handleClick={removeItem}></Card>)}
                     </div>
