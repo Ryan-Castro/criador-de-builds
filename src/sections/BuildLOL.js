@@ -40,7 +40,9 @@ const GlobalStyle = createGlobalStyle`
 const Build = styled.div`
     width: 30vw;
     height: calc(100vh - 100px);
-    background-color: yellow;
+    background-image: url("https://c4.wallpaperflare.com/wallpaper/997/549/163/league-of-legends-mastery-7-wallpaper-preview.jpg");
+    background-size: cover;
+    background-position: center center;
     float: right;
     display: flex;
     flex-direction: column;
@@ -65,6 +67,32 @@ const Build = styled.div`
 
 `
 
+const Info = styled.ul`
+    width: 100%;
+    font-size: 20px;
+    padding: 20px;
+    background-color: rgba(255, 255, 255 , 0.7);
+
+    ul{
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap:20px;
+    }
+    li{
+        
+    }
+`
+
+const BuildsBuy = styled.div`
+    height: 25%;
+    margin-bottom: 25px;
+`
+
+const GhostDiv = styled.div`
+    display: none;
+
+`
+
 
 export default function BuildLOL(){
 
@@ -75,6 +103,7 @@ export default function BuildLOL(){
     const champion = useRef()
     const [championSelect, setChampionSelect] = useState(null)
     const stats = useRef()
+    const ghost = useRef()
 
 
     useEffect(()=>{
@@ -159,32 +188,55 @@ export default function BuildLOL(){
             movespeed: 0,
         }
         if(championSelect){
-            statsCurrent.hp = championSelect.hp + (championSelect.hpperlevel*18)
-            statsCurrent.mp = championSelect.mp + (championSelect.mpperlevel*18)
-            statsCurrent.ad = championSelect.attackdamage + (championSelect.attackdamageperlevel*18)
-            statsCurrent.armor = championSelect.armor + (championSelect.armorperlevel*18)
-            statsCurrent.spellblock = championSelect.spellblock + (championSelect.spellblockperlevel*18)
-            statsCurrent.attackspeed = championSelect.attackspeed + (championSelect.attackspeedperlevel*18)
+            statsCurrent.hp = championSelect.hp + (championSelect.hpperlevel*17)
+            statsCurrent.mp = championSelect.mp + (championSelect.mpperlevel*17)
+            statsCurrent.ad = championSelect.attackdamage + (championSelect.attackdamageperlevel*17)
+            statsCurrent.armor = championSelect.armor + (championSelect.armorperlevel*17)
+            statsCurrent.spellblock = championSelect.spellblock + (championSelect.spellblockperlevel*17)
+            statsCurrent.attackspeed = championSelect.attackspeed * (1+((championSelect.attackspeedperlevel/100)*17))
             statsCurrent.movespeed = championSelect.movespeed
         }
+        let atkSpd = 1
 
         if(build.length > 0){
             build.forEach((item)=>{
-                console.log(item[0][0].description)
+                ghost.current.innerHTML = item[0][0].description
+                let attrItem = (ghost.current.children[0].children[0].innerHTML.replaceAll("<attention>", "").split("<br>"))
+                attrItem.forEach(attr=>{
+                    switch (attr.split("</attention>")[1].replaceAll(" ", "-")) {
+                        case "-Health": statsCurrent.hp += Number(attr.split("</attention>")[0]); break;
+                        case "-Mana": statsCurrent.mp += Number(attr.split("</attention>")[0]); break;
+                        case "-Attack-Damage": statsCurrent.ad += Number(attr.split("</attention>")[0]); break;
+                        case "-Ability-Power": statsCurrent.ap += Number(attr.split("</attention>")[0]); break;
+                        case "-Armor": statsCurrent.armor += Number(attr.split("</attention>")[0]); break;
+                        case "-Magic-Resist": statsCurrent.spellblock += Number(attr.split("</attention>")[0]); break;
+                        case "-Attack-Speed": atkSpd += (Number(attr.replaceAll("%", "").split("</attention>")[0]/100)); break;
+                        case "-Ability-Haste": statsCurrent.cdr += (Number(attr.split("</attention>")[0])); break;
+                        case "-Critical-Strike-Chance": statsCurrent.crit += (Number(attr.replaceAll("%", "").split("</attention>")[0])); break;
+                        case "-Move-Speed": statsCurrent.movespeed += (Number(attr.split("</attention>")[0])); break;
+                        
+                    
+                        default:
+                            break;
+                    }
+                    
+                })
             })
         }
 
+        statsCurrent.attackspeed = statsCurrent.attackspeed * atkSpd
+
         stats.current.innerHTML = `
-                                    <li>HP: ${statsCurrent.hp}<li>
-                                    <li>Mana: ${statsCurrent.mp}<li>
-                                    <li>AD: ${statsCurrent.ad}<li>
-                                    <li>AP: ${statsCurrent.ap}<li>
-                                    <li>Armor: ${statsCurrent.armor}<li>
-                                    <li>MR: ${statsCurrent.spellblock}<li>
-                                    <li>AttackSpeed: ${statsCurrent.attackspeed}<li>
-                                    <li>CDR: ${statsCurrent.cdr}<li>
-                                    <li>Critc: ${statsCurrent.crit}<li>
-                                    <li>Movespeed: ${statsCurrent.movespeed}<li>
+                                    <li>HP: ${statsCurrent.hp}</li>
+                                    <li>Mana: ${statsCurrent.mp}</li>
+                                    <li>AD: ${statsCurrent.ad.toFixed(0)}</li>
+                                    <li>AP: ${statsCurrent.ap.toFixed(0)}</li>
+                                    <li>Armor: ${statsCurrent.armor.toFixed(0)}</li>
+                                    <li>MR: ${statsCurrent.spellblock.toFixed(0)}</li>
+                                    <li>AttackSpeed: ${statsCurrent.attackspeed.toFixed(2)}</li>
+                                    <li>CDR: ${statsCurrent.cdr}</li>
+                                    <li>Critc: ${statsCurrent.crit}%</li>
+                                    <li>Movespeed: ${statsCurrent.movespeed}</li>
                                     `
    
     }
@@ -200,12 +252,14 @@ export default function BuildLOL(){
                 </Main>
             </DivInput>
             <Build>
-                <img src="" alt="" id="champIcon" ref={champion}/>
-                <div><ul  ref={stats}></ul></div>
-                <div id="itemsOfBuild">
+                <img src="https://ddragon.leagueoflegends.com/cdn/12.23.1/img/profileicon/0.png" alt="" id="champIcon" ref={champion}/>
+                <Info><ul  ref={stats}></ul></Info>
+                <BuildsBuy id="itemsOfBuild">
                     {build.map((item,i)=><Card type={item[1]} id={item[0].id?item[0].id:item[2]} key={i} num={i} handleClick={removeItem}></Card>)}
-                    </div>
+                </BuildsBuy>
             </Build>
+
+            <GhostDiv ref={ghost}></GhostDiv>
         </Content>
     )
 }
