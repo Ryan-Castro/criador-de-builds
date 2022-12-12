@@ -40,7 +40,6 @@ const GlobalStyle = createGlobalStyle`
 const Build = styled.div`
     width: 30vw;
     height: calc(100vh - 100px);
-    background-image: url("https://c4.wallpaperflare.com/wallpaper/997/549/163/league-of-legends-mastery-7-wallpaper-preview.jpg");
     background-size: cover;
     background-position: center center;
     float: right;
@@ -103,7 +102,9 @@ export default function BuildLOL(){
     const champion = useRef()
     const [championSelect, setChampionSelect] = useState(null)
     const stats = useRef()
-    const ghost = useRef()
+    const ghost = useRef() 
+    const mitcs = ["6653", "3190", "2065", "6617", "4005", "3001", "6656", "4644", "6657", "6662", "6665", "6691", "6692", "6693", "6655", "3152", "4633", "4636", "3084", "6630", "6631", "6632", "3078", "6671", "6672", "6673"]
+    const [mitcBuy, setMitcBuy] = useState(false)
 
 
     useEffect(()=>{
@@ -139,13 +140,27 @@ export default function BuildLOL(){
             .then(res=>res.json())
             .then(json=>{
                 let iArrey = []
+
                 Object.keys(json.data).forEach((item, i)=>{
                     if(json.data[item].inStore !== false){
                         if(json.data[item].maps[iMap.type!=="click"?iMap:map]){
-                            iArrey.push([json.data[item], "item", item])
+                            mitcs.forEach((mitc)=>{
+                                if(mitc==item) json.data[item].depth = 4
+                            })
+                            if(json.data[item].depth>0){
+                                iArrey.push([json.data[item], "item", item])
+                            }
+                            
                         }
                     }
                 })
+                iArrey.sort((a,b)=>{
+                    if(a[0].depth>b[0].depth) return 1
+                    if(a[0].depth<b[0].depth) return -1
+
+                    return 0
+                })
+
                 setItemsArrey(iArrey)
             })
     }
@@ -162,13 +177,29 @@ export default function BuildLOL(){
             
         }
         if(type === "item"){
-            if(build.length<6){
-                setBuild([...build, [[itemsArrey[index][0]], "item", item]])
+            if(mitcs.indexOf(item) != -1){
+                           
+                if(!mitcBuy){
+                setMitcBuy(true) 
+                if(build.length<6){
+                    setBuild([...build, [[itemsArrey[index][0]], "item", item]])
+                }
             }
+            } else {
+                console.log(itemsArrey[index][0])
+                if(build.length<6){
+                    setBuild([...build, [[itemsArrey[index][0]], "item", item]])
+                }
+            }
+
+
         }
     }
 
     function removeItem(type, item, index){
+        if(mitcs.indexOf(item) != -1){
+            setMitcBuy(false)
+        }
         let array = build
         array.splice(index, 1)
         setBuild([...array])
