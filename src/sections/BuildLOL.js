@@ -145,7 +145,7 @@ export default function BuildLOL(){
                     if(json.data[item].inStore !== false){
                         if(json.data[item].maps[iMap.type!=="click"?iMap:map]){
                             mitcs.forEach((mitc)=>{
-                                if(mitc==item) json.data[item].depth = 4
+                                if(mitc===item) json.data[item].depth = 4
                             })
                             if(json.data[item].depth>0){
                                 iArrey.push([json.data[item], "item", item])
@@ -177,7 +177,7 @@ export default function BuildLOL(){
             
         }
         if(type === "item"){
-            if(mitcs.indexOf(item) != -1){
+            if(mitcs.indexOf(item) !== -1){
                            
                 if(!mitcBuy){
                 setMitcBuy(true) 
@@ -197,7 +197,7 @@ export default function BuildLOL(){
     }
 
     function removeItem(type, item, index){
-        if(mitcs.indexOf(item) != -1){
+        if(mitcs.indexOf(item) !== -1){
             setMitcBuy(false)
         }
         let array = build
