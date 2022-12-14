@@ -13,7 +13,7 @@ flex-direction:column;
 
 const Build = styled.div`
     width: 100%;
-    height: 60%; 
+    height: 70%; 
     display: flex
 `
 
@@ -27,45 +27,72 @@ const Traits = styled.div`
 const Table = styled.div`
     width: 80%;
     height: 100%;
-    
+    table{
+        width: 100%;
+        height: 100%;
+    }
+
+    tbody{
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background-color: black;
+    }
     tr{
-        
         height: 100px;
         display: flex;
         background-color: transparent;
-    }
-    td{
         overflow: visible;
+    }
+
+    tr:nth-child(2n){
+        margin-left: 120px
+    }
+
+
+    td{
         width: 100px;
-        height: 55px;
-        background-color: blue;
+        height: 100px;
+        background-color: red;
+        background-position: center center;
+        background-size: cover;
         margin: 10px;
+        display: flex;
+        align-items: center;
+    }
+
+    div{
+        width: 100px;
+        height: 60px;
+        background-color: transparent;
         position: relative;
+        overflow: visible;
     }
-    td:before {
+    div:after{
         content: "";
         position: absolute;
-        top: -25px;
+        bottom: -20px;
         left: 0;
         width: 0;
         height: 0;
-        border-left: 50px solid transparent;
-        border-right: 50px solid transparent;
-        border-bottom: 25px solid blue;
+        border-left: 50px solid black;
+        border-right: 50px solid black;
+        border-top: 20px solid transparent;        
     }
-
-
-    td:after {
+    div:before{
         content: "";
         position: absolute;
-        bottom: -25px;
+        top: -20px;
         left: 0;
         width: 0;
         height: 0;
-        border-left: 50px solid transparent;
-        border-right: 50px solid transparent;
-        border-top: 25px solid blue;
+        border-left: 50px solid black;
+        border-right: 50px solid black;
+        border-bottom: 20px solid transparent;
     }
+
 `
 
 const DivChampions = styled.div`
@@ -87,12 +114,13 @@ img{
 
 
 
-export default function BuildTFT(){
+export default function BuildTFT(props){
 
     const [champions, setChampions] = useState([])
-    const table = useRef()
+    const table = useRef() 
 
-    useEffect(()=>{    
+    useEffect(()=>{
+        let arrayTemp =[]
         fetch("https://raw.communitydragon.org/latest/cdragon/tft/en_us.json")
             .then(res=>res.json())
             .then(json=>{
@@ -104,27 +132,27 @@ export default function BuildTFT(){
                 json.sets[8].champions.splice(54, 1)
                 json.sets[8].champions.splice(60, 1)
                 json.sets[8].champions.splice(16, 1)
-                console.log(json.sets[8])
                 let arrayChamp = json.sets[8].champions
+                console.log(json)
                 arrayChamp.sort((a,b)=>{
                     if(a.cost>b.cost) return 1
                     if(a.cost<b.cost) return -1
 
                     return 0
                 })
+                arrayTemp = json.sets[8].champions
                 setChampions(json.sets[8].champions)
                 initTalbe()
             }
-        )
-    },[])
-
+        )  
+    
     function initTalbe(){
         let htmlTable = "<table>"
         for(let h = 0; h < 4; h++){
             htmlTable += "<tr>"
 
             for(let w = 0; w < 7; w++){
-                htmlTable += "<td>R</td>"
+                htmlTable += `<td><div></div></td>`
             }
             
             htmlTable += "</tr>"
@@ -132,7 +160,33 @@ export default function BuildTFT(){
         }
         htmlTable += "</table>"
         table.current.innerHTML = htmlTable
+        let row = table.current.children[0].children[0].children
+        for (var r = 0; r < row.length; r++) {
+            let colum = row[r].children; 
+            for (var c = 0; c < colum.length; c++){
+                colum[c].addEventListener("drop", getChampion);
+                colum[c].addEventListener("dragover", dragOver);
+            }
+        }
+
+    
     }
+
+    function dragOver(e){
+        e.preventDefault()
+    }
+    function getChampion(e){
+        e.preventDefault()
+        arrayTemp.forEach(champ=>{
+            if(champ.apiName === e.dataTransfer.getData('text')){
+                console.log(champ)
+                e.target.parentNode.style.backgroundImage = `url('https://raw.communitydragon.org/latest/game/assets/ux/tft/championsplashes/${champ.apiName.toLowerCase()}_square.tft_set8.png')`
+            }
+        })
+    }    
+    },[])
+
+
     return(
         <Content>
             <Build>
