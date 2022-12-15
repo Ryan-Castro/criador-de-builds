@@ -12,7 +12,7 @@ export default function TFTChampion(props){
 
     return(
 
-        <div id={props.champion.apiName} draggable="true" ref={champ}>
+        <div id={props.champion.apiName} draggable="true" ref={champ} className={`cost${props.champion.cost}`}>
             <img src={`https://raw.communitydragon.org/latest/game/assets/ux/tft/championsplashes/${props.champion.apiName.toLowerCase()}_square.tft_set8.png`} alt=""/>
         </div>
 

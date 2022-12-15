@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import styled from "styled-components"
 import TFTChampion from "../componets/TFTChampion"
+import TraitComp from "../componets/TraitComp"
 const Content = styled.div`
 width: 100%;
 height: 100%;
@@ -20,7 +21,8 @@ const Build = styled.div`
 const Traits = styled.div`
     width: 20%;
     height: 100%;
-    background-color: red;
+    background-color: grey;
+    overflow: auto;
 
 `
 
@@ -29,7 +31,8 @@ const Table = styled.div`
     height: 100%;
     table{
         width: 100%;
-        height: 100%;
+        height: 100%;        
+        background-color: black;
     }
 
     tbody{
@@ -38,13 +41,16 @@ const Table = styled.div`
         display: flex;
         flex-direction: column;
         align-items: center;
-        background-color: black;
+        
     }
     tr{
+        width: 800px;
         height: 100px;
         display: flex;
-        background-color: transparent;
+        background-image: url('https://cdn.wallpapersafari.com/54/81/YWO8us.jpg');
         overflow: visible;
+        justify-content: space-between;
+        background-position: center top;
     }
 
     tr:nth-child(2n){
@@ -55,12 +61,13 @@ const Table = styled.div`
     td{
         width: 100px;
         height: 100px;
-        background-color: red;
+        background-color: tranparent;
         background-position: center center;
         background-size: cover;
-        margin: 10px;
         display: flex;
         align-items: center;
+        border: 1px solid black;
+        box-shadow: 17px 0px 0px black
     }
 
     div{
@@ -96,20 +103,38 @@ const Table = styled.div`
 `
 
 const DivChampions = styled.div`
-width: 100%;
-height: 40%;
-display: grid;
-grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
-overflow: auto;
+    width: 100%;
+    height: 40%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 10px;
+    overflow: auto;
 
-div{
-    width: 100px;
-    height: 100px;
-}
-img{
-    width: 100px;
-    height: 100px;
-}
+    div{
+        width: 105px;
+        height: 105px;
+    }
+    img{
+        width: 100px;
+        height: 100px;
+    }
+
+    .cost1{
+        border 3px solid #BBB;
+    }
+    .cost2{
+        border 3px solid green;
+    }
+    .cost3{
+        border 3px solid blue;
+    }
+    .cost4{
+        border 3px solid #DE0EBD;
+    }
+    .cost5{
+        border 3px solid #FFC430;
+    }
 `
 
 
@@ -117,9 +142,10 @@ img{
 export default function BuildTFT(props){
 
     const [champions, setChampions] = useState([])
+    const [traits, setTraits] = useState([])
     const table = useRef() 
     const [traitsCurrent, setTraitsCurrent] = useState({})
-    const [team, setTeam] = useState({})
+    const [team] = useState({})
 
     useEffect(()=>{
         let arrayTemp =[]
@@ -143,6 +169,7 @@ export default function BuildTFT(props){
                 })
                 arrayTemp = json.sets[8].champions
                 setChampions(json.sets[8].champions)
+                setTraits(json.sets[8].traits)
                 initTalbe()
             }
         )  
@@ -183,10 +210,10 @@ export default function BuildTFT(props){
             delete team[e.target.id]
             e.target.parentNode.style.backgroundImage = ""
             let arrayTeam = []
-            Object.keys(team).map((id)=>{
+            Object.keys(team).forEach((id)=>{
                 if(arrayTeam.indexOf(team[id].name) === -1){
                     arrayTeam.push(team[id].name)
-                    team[id].traits.map(trait=>{
+                    team[id].traits.forEach(trait=>{
                         if(traitsAny[trait]){
                             traitsAny[trait]++
                         } else {
@@ -214,10 +241,10 @@ export default function BuildTFT(props){
                         }
                     }
                     let arrayTeam = []
-                    Object.keys(team).map((id)=>{   
+                    Object.keys(team).forEach((id)=>{   
                         if(arrayTeam.indexOf(team[id].name) === -1){
                             arrayTeam.push(team[id].name)
-                            team[id].traits.map(trait=>{
+                            team[id].traits.forEach(trait=>{
                                 if(traitsAny[trait]){
                                     traitsAny[trait]++
                                 } else {
@@ -231,13 +258,13 @@ export default function BuildTFT(props){
                 }
             })
         }    
-    },[])
+    },[team])
 
 
     return(
         <Content>
             <Build>
-                <Traits><ul>{Object.keys(traitsCurrent).map((trait, i)=><li key={i}>{trait} - {traitsCurrent[trait]}</li>)}</ul></Traits>
+                <Traits><TraitComp current={traitsCurrent} traits={traits}></TraitComp></Traits>
                 <Table ref={table}></Table>
             </Build>
             <DivChampions>
