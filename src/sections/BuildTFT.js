@@ -118,6 +118,8 @@ export default function BuildTFT(props){
 
     const [champions, setChampions] = useState([])
     const table = useRef() 
+    const [traitsCurrent, setTraitsCurrent] = useState({})
+    const [team, setTeam] = useState({})
 
     useEffect(()=>{
         let arrayTemp =[]
@@ -133,7 +135,6 @@ export default function BuildTFT(props){
                 json.sets[8].champions.splice(60, 1)
                 json.sets[8].champions.splice(16, 1)
                 let arrayChamp = json.sets[8].champions
-                console.log(json)
                 arrayChamp.sort((a,b)=>{
                     if(a.cost>b.cost) return 1
                     if(a.cost<b.cost) return -1
@@ -146,51 +147,97 @@ export default function BuildTFT(props){
             }
         )  
     
-    function initTalbe(){
-        let htmlTable = "<table>"
-        for(let h = 0; h < 4; h++){
-            htmlTable += "<tr>"
+        function initTalbe(){
+            let htmlTable = "<table>"
+            for(let h = 0; h < 4; h++){
+                htmlTable += "<tr>"
 
-            for(let w = 0; w < 7; w++){
-                htmlTable += `<td><div></div></td>`
+                for(let w = 0; w < 7; w++){
+                    htmlTable += `<td><div id='${h}-${w}'></div></td>`
+                }
+                
+                htmlTable += "</tr>"
+
             }
-            
-            htmlTable += "</tr>"
+            htmlTable += "</table>"
+            table.current.innerHTML = htmlTable
+            let row = table.current.children[0].children[0].children
+            for (var r = 0; r < row.length; r++) {
+                let colum = row[r].children; 
+                for (var c = 0; c < colum.length; c++){
+                    colum[c].addEventListener("drop", getChampion);
+                    colum[c].addEventListener("dragover", dragOver);
+                    colum[c].addEventListener("click", removeChampion);
+                }
+            }
 
+        
         }
-        htmlTable += "</table>"
-        table.current.innerHTML = htmlTable
-        let row = table.current.children[0].children[0].children
-        for (var r = 0; r < row.length; r++) {
-            let colum = row[r].children; 
-            for (var c = 0; c < colum.length; c++){
-                colum[c].addEventListener("drop", getChampion);
-                colum[c].addEventListener("dragover", dragOver);
-            }
+
+        function dragOver(e){
+            e.preventDefault()
         }
 
-    
-    }
+        function removeChampion(e){
+            let traitsAny = {}
+            delete team[e.target.id]
+            e.target.parentNode.style.backgroundImage = ""
+            let arrayTeam = []
+            Object.keys(team).map((id)=>{
+                if(arrayTeam.indexOf(team[id].name) === -1){
+                    arrayTeam.push(team[id].name)
+                    team[id].traits.map(trait=>{
+                        if(traitsAny[trait]){
+                            traitsAny[trait]++
+                        } else {
+                            traitsAny[trait] = 1
+                        }
+                    })
+                }
+            })   
+            setTraitsCurrent(traitsAny)
+        }
 
-    function dragOver(e){
-        e.preventDefault()
-    }
-    function getChampion(e){
-        e.preventDefault()
-        arrayTemp.forEach(champ=>{
-            if(champ.apiName === e.dataTransfer.getData('text')){
-                console.log(champ)
-                e.target.parentNode.style.backgroundImage = `url('https://raw.communitydragon.org/latest/game/assets/ux/tft/championsplashes/${champ.apiName.toLowerCase()}_square.tft_set8.png')`
-            }
-        })
-    }    
+        function getChampion(e){
+            e.preventDefault()
+            arrayTemp.forEach((champ, i)=>{
+                if(champ.apiName === e.dataTransfer.getData('text')){
+                    let traitsAny = {}
+                    setTraitsCurrent({})
+                    if(team[e.target.id]){
+                        team[e.target.id] = champ
+                        e.target.parentNode.style.backgroundImage = `url('https://raw.communitydragon.org/latest/game/assets/ux/tft/championsplashes/${champ.apiName.toLowerCase()}_square.tft_set8.png')`
+                    } else {
+                        if(Object.keys(team).length < 9){
+                            team[e.target.id] = champ
+                            e.target.parentNode.style.backgroundImage = `url('https://raw.communitydragon.org/latest/game/assets/ux/tft/championsplashes/${champ.apiName.toLowerCase()}_square.tft_set8.png')`
+                        }
+                    }
+                    let arrayTeam = []
+                    Object.keys(team).map((id)=>{   
+                        if(arrayTeam.indexOf(team[id].name) === -1){
+                            arrayTeam.push(team[id].name)
+                            team[id].traits.map(trait=>{
+                                if(traitsAny[trait]){
+                                    traitsAny[trait]++
+                                } else {
+                                    traitsAny[trait] = 1
+                                }
+                            })
+                        }
+                        
+                        setTraitsCurrent(traitsAny)
+                    })   
+                }
+            })
+        }    
     },[])
 
 
     return(
         <Content>
             <Build>
-                <Traits></Traits>
+                <Traits><ul>{Object.keys(traitsCurrent).map((trait, i)=><li key={i}>{trait} - {traitsCurrent[trait]}</li>)}</ul></Traits>
                 <Table ref={table}></Table>
             </Build>
             <DivChampions>
