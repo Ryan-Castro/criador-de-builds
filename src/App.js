@@ -13,6 +13,7 @@ const Content = styled.div`
 const Main = styled.div`
   width: 100vw;
   height: calc(100vh - 100px);
+  overflow: visible;
 `
 
 function App() {

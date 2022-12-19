@@ -109,16 +109,7 @@ const DivChampions = styled.div`
     flex-wrap: wrap;
     justify-content: space-between;
     gap: 10px;
-    overflow: auto;
-
-    div{
-        width: 105px;
-        height: 105px;
-    }
-    img{
-        width: 100px;
-        height: 100px;
-    }
+    overflow-y: visible;
 
     .cost1{
         border 3px solid #BBB;
@@ -135,6 +126,8 @@ const DivChampions = styled.div`
     .cost5{
         border 3px solid #FFC430;
     }
+
+
 `
 
 
@@ -149,7 +142,7 @@ export default function BuildTFT(props){
 
     useEffect(()=>{
         let arrayTemp =[]
-        fetch("https://raw.communitydragon.org/latest/cdragon/tft/en_us.json")
+        fetch("https://raw.communitydragon.org/latest/cdragon/tft/pt_br.json")
             .then(res=>res.json())
             .then(json=>{
                 json.sets[8].champions.splice(51, 1)
