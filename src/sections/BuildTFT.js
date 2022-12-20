@@ -134,12 +134,13 @@ const DivChampions = styled.div`
 
 export default function BuildTFT(props){
 
+    const content = useRef()
+    const table = useRef() 
     const [champions, setChampions] = useState([])
     const [traits, setTraits] = useState([])
-    const table = useRef() 
     const [traitsCurrent, setTraitsCurrent] = useState({})
     const [team] = useState({})
-
+    let dimensions = content.current
     useEffect(()=>{
         let arrayTemp =[]
         fetch("https://raw.communitydragon.org/latest/cdragon/tft/pt_br.json")
@@ -255,13 +256,13 @@ export default function BuildTFT(props){
 
 
     return(
-        <Content>
+        <Content ref={content}>
             <Build>
                 <Traits><TraitComp current={traitsCurrent} traits={traits}></TraitComp></Traits>
                 <Table ref={table}></Table>
             </Build>
             <DivChampions>
-                {champions.map((champion, i)=><TFTChampion champion={champion} key={i}/>)}
+                {champions.map((champion, i)=><TFTChampion champion={champion} key={i} dimensions={dimensions}/>)}
             </DivChampions>
         </Content>
     )
