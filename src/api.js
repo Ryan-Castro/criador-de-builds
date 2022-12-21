@@ -1,10 +1,10 @@
 require('dotenv').config()
-const { default: axios } = require('axios');
-const cors = require('cors')
-const express = require('express');
-const champions = {}
-
-const app = express();
+const { default: axios } =  require('axios');
+const cors =                require('cors')
+const express =             require('express');
+const app =                 express();
+const champions =           {}
+const Response =            {}
 
 app.use(cors())
 
@@ -20,32 +20,34 @@ app.get('/summoner/:summonerName', async (req,res)=>{
         headers: {"X-Riot-Token": process.env.TOKEN_RIOT}
     }).catch(err=>res.status(err.response.status).json(err.responde))
     const {id, profileIconId, summonerLevel, puuid} =  summonerIdResponde.data
-    res.json(summonerIdResponde.data)
+    Response['id'] =            id
+    Response['profileIconId'] = profileIconId
+    Response['summonerLevel'] = summonerLevel
+    Response['puuid'] =         puuid
+    Response['name'] =          summonerIdResponde.data.name
+    await searchRanked(id)
+    await searchMastery(id)
+    res.json(Response)
 })
 
-app.get('/ranked/:summonerName', async (req,res)=>{
-    const {summonerName} = req.params
-    const summonerIdResponde = await axios.get(`https://br1.api.riotgames.com/lol/summoner/v4/summoners/by-name/${summonerName}`, {
-        headers: {"X-Riot-Token": process.env.TOKEN_RIOT}
-    }).catch(err=>res.status(err.response.status).json(err.responde))
-    const {id, profileIconId, summonerLevel, puuid} =  summonerIdResponde.data
+async function searchRanked(id){
     const responseRanked = await axios.get(`https://br1.api.riotgames.com/lol/league/v4/entries/by-summoner/${id}`, {
         headers: {"X-Riot-Token": process.env.TOKEN_RIOT}
     }).catch(err=>res.status(err.response.status).json(err.responde))
-    res.json(responseRanked.data)
-})
+    Response['ranked'] = {  tier: responseRanked.data[0].tier,
+                                    rank: responseRanked.data[0].rank,
+                                    wins: responseRanked.data[0].wins,
+                                    losses: responseRanked.data[0].losses,
+                                    leaguePoints: responseRanked.data[0].leaguePoints}
+}
 
-app.get('/mastery/:summonerName', async (req,res)=>{
-    const {summonerName} = req.params
-    const summonerIdResponde = await axios.get(`https://br1.api.riotgames.com/lol/summoner/v4/summoners/by-name/${summonerName}`, {
-        headers: {"X-Riot-Token": process.env.TOKEN_RIOT}
-    }).catch(err=>res.status(err.response.status).json(err.responde))
-    const {id, profileIconId, summonerLevel, puuid} =  summonerIdResponde.data
+async function searchMastery(id){
     const responseMastery = await axios.get(`https://br1.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-summoner/${id}`, {
         headers: {"X-Riot-Token": process.env.TOKEN_RIOT}
     }).catch(err=>res.status(err.response.status).json(err.responde))
-    res.json(responseMastery.data)
-})
+    Response['mastery'] = [responseMastery.data[0],responseMastery.data[1],responseMastery.data[2]]
+}
+
 
 app.get('/champions', async (req,res)=>{
     await axios.get(`https://ddragon.leagueoflegends.com/api/versions.json`).then(async (version)=>{
@@ -54,7 +56,6 @@ app.get('/champions', async (req,res)=>{
             Object.keys(championsinput.data.data).forEach(async champion=>{
                 champions[championsinput.data.data[champion].key] = await championsinput.data.data[champion].id
             })
-            
         })
     })  
     res.json(champions)

@@ -19,7 +19,6 @@ const Content = styled.div`
 const Maestria = styled.div`
     width: 32%;
     height: 100%;
-    background-color: purple;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -30,9 +29,10 @@ const Maestria = styled.div`
         display: flex;
         flex-direction: column;
         align-items: center;
-        border: 1px solid black;
-        box-shadow: 2px 2px 2px black;
+        border: 1px solid white;
+        box-shadow: 2px 2px 2px white;
         justify-content: space-between;
+        background-color: grey;
         
     }
     img{
@@ -54,7 +54,6 @@ const Maestria = styled.div`
 const Inputs = styled.div`
     width: 32%;
     height: 100%;
-    background-color: red;
     position: relative;
     display: flex;
     flex-direction: column;
@@ -100,7 +99,17 @@ const Inputs = styled.div`
 const Elo = styled.div`
     width: 36%;
     height: 100%;
-    background-color: yellow;
+    display: flex;
+    align-items: center;
+    img{
+        height: 60%;
+    }
+    div{
+        white-space: nowrap;
+        background-color: grey;
+        padding: 30px;
+        border-radius: 50px
+    }
 `
 
 const Historico = styled.div`
@@ -110,7 +119,7 @@ background-color: blue;
 `
 
 const Winrate = styled.div`
-background-color: green;
+    background-color: green;
     width: 50%;
     height: 100%;
 `
@@ -120,12 +129,14 @@ export default function Info(){
     const inputName = useRef()
     const input = useRef()
     const mastery = useRef()
+    const elo = useRef()
 
     async function search(){
         fetch(`http://localhost:3333/summoner/${inputName.current.value}`)
             .then(res=>res.json())
             .then(json=>{
-                searchMastery(inputName.current.value)
+                searchMastery(json.mastery)
+                searchRanked(json.ranked)
                 input.current.children[0].ariaLabel = json.summonerLevel
                 input.current.children[1].innerHTML = json.name
                 input.current.children[2].value = ""
@@ -154,22 +165,28 @@ export default function Info(){
             })        
     }
 
-    function searchMastery(name){
+    function searchMastery(masteryInput){
         fetch(`http://localhost:3333/champions`).then(res=>res.json()).then(champions=>{
-            fetch(`http://localhost:3333/mastery/${name}`)
-                .then(res=>res.json())
-                .then(ranked=>{
-                    for(let i = 0; i < 3 ; i++){
-                        mastery.current.children[i].innerHTML = `
-                            <img src="http://ddragon.leagueoflegends.com/cdn/12.23.1/img/champion/${champions[ranked[i].championId]}.png"/>
-                            <div>
-                                <h1>${champions[ranked[i].championId]}</h1>
-                                <h2>${ranked[i].championPoints}</h2>
-                            </div>    `
-                    }
-            })
+            for(let i = 0; i < 3 ; i++){
+                mastery.current.children[i].innerHTML = `
+                    <img src="http://ddragon.leagueoflegends.com/cdn/12.23.1/img/champion/${champions[masteryInput[i].championId]}.png"/>
+                    <div>
+                        <h1>${champions[masteryInput[i].championId]}</h1>
+                        <h2>${masteryInput[i].championPoints}</h2>
+                    </div>    `
+            }
         })
-  
+    }
+
+    function searchRanked(ranked){
+        elo.current.innerHTML = `
+            <img src='./emblemas/${ranked.tier}.png' alt=""/>
+            <div>
+                <h1>Tier: ${ranked.rank}</h1>
+                <h2>Wins / Losses: ${ranked.wins}/${ranked.losses}</h2>
+                <h2>PDL: ${ranked.leaguePoints}</h2>
+            </div>`
+
     }
     return(
         <Content>
@@ -188,7 +205,7 @@ export default function Info(){
                     <input ref={inputName} placeholder="Coloque seu Nick"></input>
                     <input type="button" value='buscar' onClick={search}/>
                 </Inputs>
-                <Elo>
+                <Elo ref={elo}>
                 </Elo>
             
             </div>
