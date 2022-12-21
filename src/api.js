@@ -2,6 +2,7 @@ require('dotenv').config()
 const { default: axios } = require('axios');
 const cors = require('cors')
 const express = require('express');
+const champions = {}
 
 const app = express();
 
@@ -44,4 +45,17 @@ app.get('/mastery/:summonerName', async (req,res)=>{
         headers: {"X-Riot-Token": process.env.TOKEN_RIOT}
     }).catch(err=>res.status(err.response.status).json(err.responde))
     res.json(responseMastery.data)
+})
+
+app.get('/champions', async (req,res)=>{
+    await axios.get(`https://ddragon.leagueoflegends.com/api/versions.json`).then(async (version)=>{
+        champions["version"] = version.data[0] 
+        await axios.get(`http://ddragon.leagueoflegends.com/cdn/${version.data[0]}/data/en_US/champion.json`).then((championsinput)=>{
+            Object.keys(championsinput.data.data).forEach(async champion=>{
+                champions[championsinput.data.data[champion].key] = await championsinput.data.data[champion].id
+            })
+            
+        })
+    })  
+    res.json(champions)
 })

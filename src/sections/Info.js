@@ -16,7 +16,41 @@ const Content = styled.div`
         display: flex;
     }
 `
+const Maestria = styled.div`
+    width: 32%;
+    height: 100%;
+    background-color: purple;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
+    &>div{
+        width: 32%;
+        height: 70%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        border: 1px solid black;
+        box-shadow: 2px 2px 2px black;
+        justify-content: space-between;
+        
+    }
+    img{
+        width: 100%;
+        border-radius: 50%;
+    }
+    #mono{
+        order: 2
+    }
+    #main1{
+        order: 1;
+        transform: scale(70%);
+    }
+    #main2{
+        order: 3;
+        transform: scale(70%);
+    }
+`
 const Inputs = styled.div`
     width: 32%;
     height: 100%;
@@ -68,11 +102,7 @@ const Elo = styled.div`
     height: 100%;
     background-color: yellow;
 `
-const Maestria = styled.div`
-    width: 32%;
-    height: 100%;
-    background-color: purple;
-`
+
 const Historico = styled.div`
 background-color: blue;
     width: 50%;
@@ -89,11 +119,13 @@ export default function Info(){
 
     const inputName = useRef()
     const input = useRef()
+    const mastery = useRef()
 
     async function search(){
         fetch(`http://localhost:3333/summoner/${inputName.current.value}`)
             .then(res=>res.json())
             .then(json=>{
+                searchMastery(inputName.current.value)
                 input.current.children[0].ariaLabel = json.summonerLevel
                 input.current.children[1].innerHTML = json.name
                 input.current.children[2].value = ""
@@ -118,12 +150,34 @@ export default function Info(){
                 if(json.summonerLevel > 449){input.current.children[0].children[0].src = 'https://vignette.wikia.nocookie.net/leagueoflegends/images/a/a9/Level_450_Summoner_Icon_Border.png/revision/latest?cb=20180406054738'} 
                 if(json.summonerLevel > 474){input.current.children[0].children[0].src = 'https://vignette.wikia.nocookie.net/leagueoflegends/images/9/9f/Level_475_Summoner_Icon_Border.png/revision/latest?cb=20180406054805'} 
                 if(json.summonerLevel > 499){input.current.children[0].children[0].src = 'https://vignette.wikia.nocookie.net/leagueoflegends/images/2/2e/Level_500_Summoner_Icon_Border.png/revision/latest?cb=20180406054832'} 
+                
             })        
+    }
+
+    function searchMastery(name){
+        fetch(`http://localhost:3333/champions`).then(res=>res.json()).then(champions=>{
+            fetch(`http://localhost:3333/mastery/${name}`)
+                .then(res=>res.json())
+                .then(ranked=>{
+                    for(let i = 0; i < 3 ; i++){
+                        mastery.current.children[i].innerHTML = `
+                            <img src="http://ddragon.leagueoflegends.com/cdn/12.23.1/img/champion/${champions[ranked[i].championId]}.png"/>
+                            <div>
+                                <h1>${champions[ranked[i].championId]}</h1>
+                                <h2>${ranked[i].championPoints}</h2>
+                            </div>    `
+                    }
+            })
+        })
+  
     }
     return(
         <Content>
             <div>   
-                <Maestria>
+                <Maestria ref={mastery}>
+                    <div id="mono"></div>
+                    <div id="main1"></div>
+                    <div id="main2"></div>
                 </Maestria>
                 <Inputs ref={input}>
                     <div aria-label="00">
