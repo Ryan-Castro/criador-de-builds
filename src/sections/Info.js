@@ -1,4 +1,4 @@
-import { useRef } from "react"
+import { useRef, useState } from "react"
 import styled from "styled-components"
 const Content = styled.div`
     width: 100%;
@@ -113,9 +113,48 @@ const Elo = styled.div`
 `
 
 const Historico = styled.div`
-background-color: blue;
     width: 50%;
     height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    &>ul{
+        width: 90%;
+        height: 90%;
+        overflow: auto;
+        display: grid;
+    }
+    &>ul>li{
+        width: 100%;
+        height: 80px;
+        border: 1px solid black;
+        background-color: grey;
+        display: flex;
+        justify-content: space-between;
+        padding: 5px
+    }
+    &>ul>li>img{
+        height: 70%;
+    }
+    div{
+        display: flex;
+    }
+    .team{
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    .team>li{
+        height: 20%;
+        display: flex;
+        align-items: center;
+        margin-bottom: 2px
+    }
+
+    .team>li>img{
+        height: 100%;
+    }
 `
 
 const Winrate = styled.div`
@@ -130,13 +169,17 @@ export default function Info(){
     const input = useRef()
     const mastery = useRef()
     const elo = useRef()
+    const listMatches = useRef()
+    let [puuid] = useState()
 
     async function search(){
         fetch(`http://localhost:3333/summoner/${inputName.current.value}`)
             .then(res=>res.json())
             .then(json=>{
+                puuid = json.puuid
                 searchMastery(json.mastery)
                 searchRanked(json.ranked)
+                searchMetchs(inputName.current.value)
                 input.current.children[0].ariaLabel = json.summonerLevel
                 input.current.children[1].innerHTML = json.name
                 input.current.children[2].value = ""
@@ -179,7 +222,6 @@ export default function Info(){
     }
 
     function searchRanked(ranked){
-        console.log(ranked)
         elo.current.innerHTML = `
             <img src='./emblemas/${ranked.tier}.png' alt=""/>
             <div>
@@ -187,7 +229,71 @@ export default function Info(){
                 <h2>Wins / Losses: ${ranked.wins}/${ranked.losses}</h2>
                 <h2>PDL: ${ranked.leaguePoints}</h2>
             </div>`
+    }
 
+    function searchMetchs(summonerName, queue){
+        let queueInput = queue?queue:""
+        fetch(`http://localhost:3333/metchs?summonerName=${summonerName}&queue=${queueInput}`)
+        .then(res=>res.json())
+        .then(json=>{
+            listMatches.current.innerHTML=""
+            json.forEach((metch, i)=>{
+                fetch(`http://localhost:3333/metch/${metch}`)
+                    .then(res=>res.json())
+                    .then(json=>{createHistoc(json,i)})
+            })
+        })
+    }
+
+    function createHistoc(match, i){
+        let gameMode
+        let isWiner
+        let player
+        let teamA = []
+        let teamB = []
+        match.info.participants.forEach(participant=>{
+            if(participant.teamId === 100){
+                teamA.push({champion: participant.championName, player: participant.summonerName})
+            }
+            if(participant.teamId === 200){
+                teamB.push({champion: participant.championName, player: participant.summonerName})
+            }
+            if(participant.puuid === puuid){
+                player = participant
+                match.info.teams.forEach(team=>{
+                    if(team.teamId === participant.teamId){
+                        isWiner = team.win
+                    }
+                }) 
+            }
+        })
+        
+        switch (match.info.gameMode) {
+            case 'CLASSIC': gameMode = "Normal"; break;
+            default: gameMode = match.info.gameMode; break;
+        }
+        listMatches.current.innerHTML += `
+            <li style="order:${i}; background-color:${isWiner?"#28344E":"#59343B"}">
+                ${gameMode}
+                <img alt="" src="http://ddragon.leagueoflegends.com/cdn/12.23.1/img/champion/${player.championName}.png">
+                <div>${player.kills}/${player.deaths}/${player.assists} KDA = ${(player.kills+player.assists)/player.deaths}</div>
+                <div>
+                    <ul class="team">
+                        <li><img src="http://ddragon.leagueoflegends.com/cdn/12.23.1/img/champion/${teamA[0].champion}.png" alt="">${teamA[0].player}</li>
+                        <li><img src="http://ddragon.leagueoflegends.com/cdn/12.23.1/img/champion/${teamA[1].champion}.png" alt="">${teamA[1].player}</li>
+                        <li><img src="http://ddragon.leagueoflegends.com/cdn/12.23.1/img/champion/${teamA[2].champion}.png" alt="">${teamA[2].player}</li>
+                        <li><img src="http://ddragon.leagueoflegends.com/cdn/12.23.1/img/champion/${teamA[3].champion}.png" alt="">${teamA[3].player}</li>
+                        <li><img src="http://ddragon.leagueoflegends.com/cdn/12.23.1/img/champion/${teamA[4].champion}.png" alt="">${teamA[4].player}</li>
+                    </ul>
+                    <ul class="team">
+                        <li><img src="http://ddragon.leagueoflegends.com/cdn/12.23.1/img/champion/${teamB[0].champion}.png" alt="">${teamB[0].player}</li>
+                        <li><img src="http://ddragon.leagueoflegends.com/cdn/12.23.1/img/champion/${teamB[1].champion}.png" alt="">${teamB[1].player}</li>
+                        <li><img src="http://ddragon.leagueoflegends.com/cdn/12.23.1/img/champion/${teamB[2].champion}.png" alt="">${teamB[2].player}</li>
+                        <li><img src="http://ddragon.leagueoflegends.com/cdn/12.23.1/img/champion/${teamB[3].champion}.png" alt="">${teamB[3].player}</li>
+                        <li><img src="http://ddragon.leagueoflegends.com/cdn/12.23.1/img/champion/${teamB[4].champion}.png" alt="">${teamB[4].player}</li>
+                    </ul>
+                </div>
+            </li>`
     }
     return(
         <Content>
@@ -212,6 +318,9 @@ export default function Info(){
             </div>
             <div> 
                 <Historico>
+                    <ul ref={listMatches}>
+
+                    </ul>
                 </Historico>
                 <Winrate>
                 </Winrate>
