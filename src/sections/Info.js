@@ -179,6 +179,7 @@ export default function Info(){
     }
 
     function searchRanked(ranked){
+        console.log(ranked)
         elo.current.innerHTML = `
             <img src='./emblemas/${ranked.tier}.png' alt=""/>
             <div>

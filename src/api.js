@@ -60,3 +60,21 @@ app.get('/champions', async (req,res)=>{
     })  
     res.json(champions)
 })
+
+app.get('/metchs', async (req,res)=>{
+    const summonerIdResponde = await axios.get(`https://br1.api.riotgames.com/lol/summoner/v4/summoners/by-name/${req.query.summonerName}`, {
+        headers: {"X-Riot-Token": process.env.TOKEN_RIOT}
+    }).catch(err=>res.status(err.response.status).json(err.responde))
+    const {puuid} = summonerIdResponde.data
+    const metchs = await axios.get(`https://americas.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?queue=${req.query.queue}&start=0&count=20`, {
+        headers: {"X-Riot-Token": process.env.TOKEN_RIOT}
+    }).catch(err=>res.status(err.response.status).json(err.responde))
+    res.json(metchs.data)
+})
+
+app.get('/metch/:metchInput', async (req, res)=>{
+    const metch = await axios.get(`https://americas.api.riotgames.com/lol/match/v5/matches/${req.params.metchInput}`, {
+        headers: {"X-Riot-Token": process.env.TOKEN_RIOT}
+        }).catch(err=>res.status(err.response.status).json(err.responde))        
+    res.json(metch.data)
+})
