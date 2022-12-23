@@ -34,7 +34,7 @@ async function searchRanked(id){
     const responseRanked = await axios.get(`https://br1.api.riotgames.com/lol/league/v4/entries/by-summoner/${id}`, {
         headers: {"X-Riot-Token": process.env.TOKEN_RIOT}
     }).catch(err=>res.status(err.response.status).json(err.responde))
-    Response['ranked'] = {  tier: responseRanked.data[0].tier,
+    Response['ranked'] = {          tier: responseRanked.data[0].tier,
                                     rank: responseRanked.data[0].rank,
                                     wins: responseRanked.data[0].wins,
                                     losses: responseRanked.data[0].losses,

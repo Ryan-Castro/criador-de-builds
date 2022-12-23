@@ -1,5 +1,6 @@
 import { useRef, useState } from "react"
 import styled from "styled-components"
+import Winrate from "../componets/infoWinrate"
 const Content = styled.div`
     width: 100%;
     height: 100%;
@@ -12,7 +13,7 @@ const Content = styled.div`
 
     &>div{
         width: 100%;
-        height: 50%;
+        height: 40%;
         display: flex;
     }
 `
@@ -22,6 +23,9 @@ const Maestria = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
+    padding-left: 50px;
+    opacity: 0;
+    transition: 1s;
 
     &>div{
         width: 32%;
@@ -36,7 +40,7 @@ const Maestria = styled.div`
         
     }
     img{
-        width: 100%;
+        height: 50%;
         border-radius: 50%;
     }
     #mono{
@@ -76,7 +80,7 @@ const Inputs = styled.div`
         content: attr(aria-label);
         position: absolute;
         left: 50%;
-        top: 50%;
+        top: 49%;
         transform: translateX(-50%);
         z-index: 2;
     }
@@ -101,6 +105,8 @@ const Elo = styled.div`
     height: 100%;
     display: flex;
     align-items: center;
+    opacity: 0;
+    transition: 1s;
     img{
         height: 60%;
     }
@@ -118,50 +124,92 @@ const Historico = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
+    opacity: 0;
+    transition: 1s;
+
+    h1{
+        width:25%;
+    }
     
     &>ul{
         width: 90%;
         height: 90%;
         overflow: auto;
         display: grid;
+        transform: scale(85%);
     }
-    &>ul>li{
+    .win, .loser, .remake{
         width: 100%;
         height: 80px;
         border: 1px solid black;
         background-color: grey;
         display: flex;
         justify-content: space-between;
-        padding: 5px
+        padding: 5px;
+        margin-bottom: 5px;
     }
-    &>ul>li>img{
-        height: 70%;
+    .win>img, .loser>img, .remake>img{
+        height: 100%;
+        border-radius: 50%;
     }
-    div{
+    .win{
+        background-color: #28344E;
+        border: 1px solid #000096;
+        box-shadow: 0px 2px 5px blue;
+    }
+    .loser{
+        background-color: #59343B;
+        border: 1px solid #dd3051;
+        box-shadow: 0px 2px 5px red;
+    }
+    .score{
         display: flex;
+        flex-direction:column;
+    }
+    .teams{
+        display: flex;      
+        flex-direction: column;
+        width: 30%;
+        overflow: visible;
     }
     .team{
-        height: 100%;
+        height: 50%;
         display: flex;
-        flex-direction: column;
+        justify-content: space-between;
+        overflow: visible;
     }
     .team>li{
-        height: 20%;
+        height: 90%;
         display: flex;
         align-items: center;
-        margin-bottom: 2px
+        margin-bottom: 2px;
+        margin-left: 2px;
+        position: relative;
+        overflow: visible;
+        &::after{
+            content: attr(arial-label);
+            background-color: grey;
+            position: absolute;
+            opacity: 0;
+            transition: .5s;
+            white-space: nowrap;
+            height: 20px;
+            border-radius: 30px;
+            right:100%;
+            z-index: 9;
+            pointer-events: none;
+            padding: 10px;
+        }
+        &:hover::after{
+            opacity: 1;
+        }
     }
-
     .team>li>img{
         height: 100%;
     }
 `
 
-const Winrate = styled.div`
-    background-color: green;
-    width: 50%;
-    height: 100%;
-`
+
 
 export default function Info(){
 
@@ -171,6 +219,8 @@ export default function Info(){
     const elo = useRef()
     const listMatches = useRef()
     let [puuid] = useState()
+    let [score, setScore] = useState([])
+    let scoreArrey = []
 
     async function search(){
         fetch(`http://localhost:3333/summoner/${inputName.current.value}`)
@@ -219,6 +269,7 @@ export default function Info(){
                     </div>    `
             }
         })
+        mastery.current.style.opacity = 1
     }
 
     function searchRanked(ranked){
@@ -229,34 +280,37 @@ export default function Info(){
                 <h2>Wins / Losses: ${ranked.wins}/${ranked.losses}</h2>
                 <h2>PDL: ${ranked.leaguePoints}</h2>
             </div>`
+        elo.current.style.opacity = 1
     }
 
     function searchMetchs(summonerName, queue){
         let queueInput = queue?queue:""
         fetch(`http://localhost:3333/metchs?summonerName=${summonerName}&queue=${queueInput}`)
         .then(res=>res.json())
-        .then(json=>{
+        .then(async json=>{
             listMatches.current.innerHTML=""
-            json.forEach((metch, i)=>{
+            await json.forEach((metch, i)=>{
                 fetch(`http://localhost:3333/metch/${metch}`)
                     .then(res=>res.json())
                     .then(json=>{createHistoc(json,i)})
             })
         })
+      
     }
 
     function createHistoc(match, i){
+       
         let gameMode
         let isWiner
         let player
         let teamA = []
-        let teamB = []
+        let teamB = [] 
         match.info.participants.forEach(participant=>{
             if(participant.teamId === 100){
-                teamA.push({champion: participant.championName, player: participant.summonerName})
+                teamA.push({champion: participant.championName==="FiddleSticks"?"Fiddlesticks":participant.championName, player: participant.summonerName})
             }
             if(participant.teamId === 200){
-                teamB.push({champion: participant.championName, player: participant.summonerName})
+                teamB.push({champion: participant.championName==="FiddleSticks"?"Fiddlesticks":participant.championName, player: participant.summonerName})
             }
             if(participant.puuid === puuid){
                 player = participant
@@ -267,30 +321,47 @@ export default function Info(){
                 }) 
             }
         })
-        
-        switch (match.info.gameMode) {
-            case 'CLASSIC': gameMode = "Normal"; break;
-            default: gameMode = match.info.gameMode; break;
+        scoreArrey.push({
+            champion: player.championName, 
+            kills: player.kills,
+            deaths: player.deaths,
+            assists: player.assists,
+            result: player.win?1:0,
+            surrender: player.gameEndedInEarlySurrender
+        })
+        if(scoreArrey.length === 20){
+            setScore(scoreArrey)
+            listMatches.current.parentNode.style.opacity = 1
+        }
+        switch (match.info.queueId) {
+            case 400: gameMode = "Normal Game"; break;
+            case 420: gameMode = "Ranked Solo"; break;
+            case 440: gameMode = "Ranked flex"; break;
+            case 450: gameMode = "ARAM"; break;
+            case 700: gameMode = "Clash"; break;
+            case 76: gameMode = "URF"; break;
+            case 1020: gameMode = "Um por todos"; break;
+            default: gameMode = "Não encontrado"; break;
         }
         listMatches.current.innerHTML += `
-            <li style="order:${i}; background-color:${isWiner?"#28344E":"#59343B"}">
-                ${gameMode}
-                <img alt="" src="http://ddragon.leagueoflegends.com/cdn/12.23.1/img/champion/${player.championName}.png">
-                <div>${player.kills}/${player.deaths}/${player.assists} KDA = ${(player.kills+player.assists)/player.deaths}</div>
-                <div>
+            <li style="order:${i}" class="${player.gameEndedInEarlySurrender?"remake":isWiner?"win":"loser"}">
+                <h1>${gameMode}</h1>
+                <img alt="" src="http://ddragon.leagueoflegends.com/cdn/12.23.1/img/champion/${player.championName==="FiddleSticks"?"Fiddlesticks":player.championName}.png">
+                <div class='score'><h2>KDA = ${((player.kills+player.assists)/(player.deaths===0?1:player.deaths)).toFixed(2)} </h2><h2> ${player.kills}/${player.deaths}/${player.assists} </h2> </div>
+                <div class="teams">
                     <ul class="team">
-                        <li><img src="http://ddragon.leagueoflegends.com/cdn/12.23.1/img/champion/${teamA[0].champion}.png" alt="">${teamA[0].player}</li>
-                        <li><img src="http://ddragon.leagueoflegends.com/cdn/12.23.1/img/champion/${teamA[1].champion}.png" alt="">${teamA[1].player}</li>
-                        <li><img src="http://ddragon.leagueoflegends.com/cdn/12.23.1/img/champion/${teamA[2].champion}.png" alt="">${teamA[2].player}</li>
-                        <li><img src="http://ddragon.leagueoflegends.com/cdn/12.23.1/img/champion/${teamA[3].champion}.png" alt="">${teamA[3].player}</li>
-                        <li><img src="http://ddragon.leagueoflegends.com/cdn/12.23.1/img/champion/${teamA[4].champion}.png" alt="">${teamA[4].player}</li>
+                        <li arial-label="${teamA[0].player}"><img src="http://ddragon.leagueoflegends.com/cdn/12.23.1/img/champion/${teamA[0].champion}.png" alt=""></li>
+                        <li arial-label="${teamA[1].player}"><img src="http://ddragon.leagueoflegends.com/cdn/12.23.1/img/champion/${teamA[1].champion}.png" alt=""></li>
+                        <li arial-label="${teamA[2].player}"><img src="http://ddragon.leagueoflegends.com/cdn/12.23.1/img/champion/${teamA[2].champion}.png" alt=""></li>
+                        <li arial-label="${teamA[3].player}"><img src="http://ddragon.leagueoflegends.com/cdn/12.23.1/img/champion/${teamA[3].champion}.png" alt=""></li>
+                        <li arial-label="${teamA[4].player}"><img src="http://ddragon.leagueoflegends.com/cdn/12.23.1/img/champion/${teamA[4].champion}.png" alt=""></li>
                     </ul>
                     <ul class="team">
-                        <li><img src="http://ddragon.leagueoflegends.com/cdn/12.23.1/img/champion/${teamB[0].champion}.png" alt="">${teamB[0].player}</li>
-                        <li><img src="http://ddragon.leagueoflegends.com/cdn/12.23.1/img/champion/${teamB[1].champion}.png" alt="">${teamB[1].player}</li>
-                        <li><img src="http://ddragon.leagueoflegends.com/cdn/12.23.1/img/champion/${teamB[2].champion}.png" alt="">${teamB[2].player}</li>
-                        <li><img src="http://ddragon.leagueoflegends.com/cdn/12.23.1/img/champion/${teamB[3].champion}.png" alt="">${teamB[3].player}</li>
-                        <li><img src="http://ddragon.leagueoflegends.com/cdn/12.23.1/img/champion/${teamB[4].champion}.png" alt="">${teamB[4].player}</li>
+                        <li arial-label="${teamB[0].player}"><img src="http://ddragon.leagueoflegends.com/cdn/12.23.1/img/champion/${teamB[0].champion}.png" alt=""></li>
+                        <li arial-label="${teamB[1].player}"><img src="http://ddragon.leagueoflegends.com/cdn/12.23.1/img/champion/${teamB[1].champion}.png" alt=""></li>
+                        <li arial-label="${teamB[2].player}"><img src="http://ddragon.leagueoflegends.com/cdn/12.23.1/img/champion/${teamB[2].champion}.png" alt=""></li>
+                        <li arial-label="${teamB[3].player}"><img src="http://ddragon.leagueoflegends.com/cdn/12.23.1/img/champion/${teamB[3].champion}.png" alt=""></li>
+                        <li arial-label="${teamB[4].player}"><img src="http://ddragon.leagueoflegends.com/cdn/12.23.1/img/champion/${teamB[4].champion}.png" alt=""></li>
                     </ul>
                 </div>
             </li>`
@@ -322,7 +393,7 @@ export default function Info(){
 
                     </ul>
                 </Historico>
-                <Winrate>
+                <Winrate score={score}>    
                 </Winrate>
             </div>
             
