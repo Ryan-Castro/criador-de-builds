@@ -1,5 +1,6 @@
-import { useEffect } from "react"
+import { useState } from "react"
 import styled from "styled-components"
+import ChampVer from "../componets/ChampVer"
 import NavVersion from "../componets/NavVersion"
 const Content = styled.div`
 width: 100%;
@@ -23,19 +24,25 @@ const Output = styled.div`
 `
 export default function Version(){
 
-    useEffect(()=>{
-        fetch('https://ddragon.leagueoflegends.com/api/versions.json')
+    const [champion, setChampeons] = useState()
+    
+
+    function search(e){
+        let version = e.target?e.target.options[e.target.selectedIndex].value:e
+        fetch(`http://ddragon.leagueoflegends.com/cdn/${version}/data/en_US/champion.json`)
             .then(res=>res.json())
             .then(json=>{
-                console.log(json)
+                setChampeons(json)
             })
-    },[])
+        }
+
     return(
         <Content>
             <Input>
-                <NavVersion></NavVersion>
+                <NavVersion handleVersion={search}></NavVersion>
+                <ChampVer champions={champion}></ChampVer>
             </Input>
-            <Output>veja aqui o que mudou ao longo dos anos</Output>
+            <Output >veja aqui o que mudou ao longo dos anos</Output>
         </Content>
     )
 }
