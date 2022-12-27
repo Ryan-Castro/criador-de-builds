@@ -21,7 +21,7 @@ const Build = styled.div`
 const Traits = styled.div`
     width: 20%;
     height: 100%;
-    background-color: grey;
+    background-color: blue;
     overflow: auto;
 
 `
@@ -154,6 +154,7 @@ export default function BuildTFT(props){
                 json.sets[8].champions.splice(54, 1)
                 json.sets[8].champions.splice(60, 1)
                 json.sets[8].champions.splice(16, 1)
+                console.log(json)
                 let arrayChamp = json.sets[8].champions
                 arrayChamp.sort((a,b)=>{
                     if(a.cost>b.cost) return 1
