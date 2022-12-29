@@ -60,7 +60,10 @@ export default function ChampVer(props){
                 let stats = props.champions.data[champion].stats
                 list.current.innerHTML += `
                 <li class="champion">
-                    <img src="http://ddragon.leagueoflegends.com/cdn/${props.champions.version}/img/champion/${champion}.png"/>
+                    <div>
+                        <img src="http://ddragon.leagueoflegends.com/cdn/${props.champions.version}/img/champion/${champion}.png"/>
+                        <button class="btn">+</button>
+                    </div>
                     <div class="infos">
                         <h1>${champion}</h1>
                         <ul>
@@ -75,6 +78,8 @@ export default function ChampVer(props){
                     </div>
                 </li>`
             })
+            for(let i = 0; i<list.current.children.length;i++)
+            list.current.children[i].addEventListener('click', props.handleClickItem)
         }
     },[props])
     return(

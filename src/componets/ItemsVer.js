@@ -28,10 +28,17 @@ const Content = styled.div`
         margin-bottom: 10px
     }
 
-    div>div{
-        width: 90%;
+    .description{
+        width: 100%;
         height: 70%;
         overflow-y: auto
+    }
+
+    button{
+        width: 100%;
+        height: 30px;
+        background-color: #69e5e5;
+        border-color: cyan;
     }
  
 `
@@ -48,9 +55,11 @@ export default function ChampVer(props){
         show.current.innerHTML = ""
         Object.keys(props.items.data).forEach((item)=>{
             if(props.items.data[item].inStore !== false)
-            show.current.innerHTML += `<div><img src="https://ddragon.leagueoflegends.com/cdn/${props.items.version}/img/item/${item}.png" alt=""/><div>${props.items.data[item].description}</div></div>`
+            show.current.innerHTML += `<div id='${item}'><img src="https://ddragon.leagueoflegends.com/cdn/${props.items.version}/img/item/${item}.png" alt=""/><div class='description'>${props.items.data[item].description}</div><button class="btn">+</button></div>`
         })
         }
+        for(let i = 0; i<show.current.children.length;i++)
+        show.current.children[i].addEventListener('click', props.handleClickItem)
     },[props])
     return(
         <Content ref={show}>
